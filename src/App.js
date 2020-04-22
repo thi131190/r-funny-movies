@@ -40,7 +40,7 @@ function App() {
   };
 
   const getMoviesInfo = async (id, youtubeId, sharedBy) => {
-    const apiKey = "AIzaSyAy-aUazecNE_zg-vbPB_1oD5mQ487ATsY";
+    const apiKey = "AIzaSyDK3ubxk_5hg-2iiCws88BAYt1V-tM9xfg";
     const url = `https://www.googleapis.com/youtube/v3/videos?id=${youtubeId}&key=${apiKey}&part=snippet,statistics&fields=items(id,snippet,statistics)`;
     const response = await fetch(url, {
       headers: {
@@ -89,7 +89,7 @@ function App() {
               <Register />
             </Route>
             <Route path="/">
-              <Home movies={movies} />
+              <Home movies={movies} user={user} />
             </Route>
           </Switch>
         </div>

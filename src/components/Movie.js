@@ -39,7 +39,7 @@ export default function Movie(props) {
   return (
     <Grid container direction="row" spacing={10}>
       <Grid item xs={6}>
-        <YouTube videoId={props.movie.id} />
+        <YouTube videoId={movie.id} />
       </Grid>
       <Grid item xs={6}>
         <Card className={classes.root}>
@@ -78,7 +78,7 @@ export default function Movie(props) {
                 collapseText="SHOW LESS"
                 ellipsisText=""
               >
-                <pre align="left">{props.movie.snippet.description}</pre>
+                <pre align="left">{movie.snippet.description}</pre>
               </ExpandCollapse>
             </div>
           </CardContent>
