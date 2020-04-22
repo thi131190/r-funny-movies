@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -10,9 +10,10 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { makeStyles } from "@material-ui/core/styles";
 import { useHistory, Link as RouterLink } from "react-router-dom";
+import notify from "./../utils/Notification";
 
 function Copyright() {
   return (
@@ -46,13 +47,44 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
 }));
-
-export default function SignUp() {
+export default function Register() {
   const classes = useStyles();
   const history = useHistory();
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
 
   const home = () => {
     history.push("/");
+  };
+
+  const register = async (e) => {
+    e.preventDefault();
+    // const url = `${process.env.REACT_APP_API_URL}/user/signup`;
+    const url = `https://fakebook-fs.herokuapp.com/user/signup`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        firstname: firstName,
+        lastname: lastName,
+        password: password,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.code === 200) {
+        history.push("/login");
+        notify("Info", "Successfully created account", "success");
+      } else if (data.code === 409) {
+        notify("Error", "Email already exist!", "danger");
+      }
+    }
   };
 
   return (
@@ -72,22 +104,28 @@ export default function SignUp() {
                 autoComplete="fname"
                 name="firstName"
                 variant="outlined"
-                required
                 fullWidth
                 id="firstName"
                 label="First Name"
                 autoFocus
+                value={firstName}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 variant="outlined"
-                required
                 fullWidth
                 id="lastName"
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
+                value={lastName}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -99,6 +137,10 @@ export default function SignUp() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -111,12 +153,10 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
               />
             </Grid>
           </Grid>
@@ -126,11 +166,13 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={register}
           >
             Sign Up
           </Button>
+
           <Grid container justify="center">
-            <Grid item className>
+            <Grid item>
               <RouterLink to="./login" variant="body2">
                 {"Already have an account? Sign in"}
               </RouterLink>

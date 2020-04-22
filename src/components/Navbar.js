@@ -24,9 +24,19 @@ const useStyles = makeStyles((theme) => ({
 export default function ButtonAppBar(props) {
   const classes = useStyles();
   const history = useHistory();
+  const { user } = props;
+  const token = localStorage.getItem("token");
 
   const login = () => {
     history.push("/login");
+  };
+
+  const logout = async () => {
+    if (token) {
+      props.setUser(null);
+      localStorage.removeItem("token");
+      history.push("/");
+    }
   };
 
   return (
@@ -43,9 +53,19 @@ export default function ButtonAppBar(props) {
             Funny Movies
           </IconButton>
           <Typography variant="h6" className={classes.title}></Typography>
-          <Button color="inherit" onClick={login}>
-            Login
-          </Button>
+          {!user && (
+            <Button color="inherit" onClick={login}>
+              Login
+            </Button>
+          )}
+          {user && (
+            <span>
+              <Button color="inherit">Share a movie</Button>
+              <Button color="inherit" onClick={logout}>
+                Logout
+              </Button>
+            </span>
+          )}
         </Toolbar>
       </AppBar>
     </div>
