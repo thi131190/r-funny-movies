@@ -7,25 +7,19 @@ import Home from "./pages/Home";
 import ReactNotifications from "react-notifications-component";
 import { Switch, Route } from "react-router-dom";
 import notify from "./utils/Notification";
+import { getIdFromUrl } from "./utils/Common";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  function getParam(name) {
-    const url = window.location.href;
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regexS = "[\\?&]" + name + "=([^&#]*)";
-    var regex = new RegExp(regexS);
-    var results = regex.exec(url);
-    return results == null ? null : results[1];
-  }
+  let urls = [];
 
   const getUser = async () => {
-    const token = localStorage.getItem("token") || getParam("api_key");
+    const token = localStorage.getItem("token");
     if (token) {
-      const url = `https://fakebook-fs.herokuapp.com/user/get_user`;
-      // const url = `${process.env.REACT_APP_API_URL}/user/get_user`;
+      const url = `${process.env.REACT_APP_API_URL}/user/get_user`;
       const response = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
@@ -45,28 +39,61 @@ function App() {
     setLoading(false);
   };
 
+  const getMoviesInfo = async (id, youtubeId, sharedBy) => {
+    const apiKey = "AIzaSyAy-aUazecNE_zg-vbPB_1oD5mQ487ATsY";
+    const url = `https://www.googleapis.com/youtube/v3/videos?id=${youtubeId}&key=${apiKey}&part=snippet,statistics&fields=items(id,snippet,statistics)`;
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setMovies((movies) => [
+      { id: id, sharedBy: sharedBy, info: data.items[0] },
+      ...movies,
+    ]);
+  };
+
+  const renderMovies = (urls) => {
+    urls.map((e) => {
+      getMoviesInfo(e.id, getIdFromUrl(e.url), e.sharedBy);
+    });
+  };
+
   useEffect(() => {
     getUser();
+    if (localStorage.getItem("movieUrls")) {
+      urls = JSON.parse(localStorage.getItem("movieUrls"));
+    }
+    renderMovies(urls);
   }, []);
 
   return (
     <div className="App">
       <ReactNotifications />
-      <Navbar user={user} setUser={setUser} />
-      <Switch>
-        <Route path="/login">
-          <Login setUser={setUser} />
-        </Route>
-        <Route path="/register">
-          <Register />
-        </Route>
-        <Route path="/register">
-          <Register />
-        </Route>
-        <Route path="/">
-          <Home />
-        </Route>
-      </Switch>
+      <Navbar
+        user={user}
+        setUser={setUser}
+        urls={urls}
+        renderMovies={renderMovies}
+      />
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <div>
+          <Switch>
+            <Route path="/login">
+              <Login setUser={setUser} />
+            </Route>
+            <Route path="/register">
+              <Register />
+            </Route>
+            <Route path="/">
+              <Home movies={movies} />
+            </Route>
+          </Switch>
+        </div>
+      )}
     </div>
   );
 }

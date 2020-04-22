@@ -58,8 +58,7 @@ export default function Login(props) {
 
   const login = async (e) => {
     e.preventDefault();
-    // const url = `${process.env.REACT_APP_API_URL}/user/login`;
-    const url = `https://fakebook-fs.herokuapp.com/user/login`;
+    const url = `${process.env.REACT_APP_API_URL}/user/login`;
     const response = await fetch(url, {
       method: "POST",
       headers: {

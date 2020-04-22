@@ -2,7 +2,7 @@ import { store } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 import "animate.css";
 
-export default function notify(
+export default function getIdFromUrl(
   title = "Info",
   message = "Change me!",
   type = "default"
