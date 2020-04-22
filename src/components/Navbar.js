@@ -6,6 +6,7 @@ import MovieIcon from "@material-ui/icons/Movie";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,8 +23,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ButtonAppBar(props) {
   const classes = useStyles();
+  const history = useHistory();
 
-  const login = () => {};
+  const login = () => {
+    history.push("/login");
+  };
 
   return (
     <div className={classes.root}>

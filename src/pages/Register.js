@@ -12,6 +12,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useHistory, Link as RouterLink } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -48,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
   const classes = useStyles();
+  const history = useHistory();
+
+  const home = () => {
+    history.push("/");
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -123,13 +129,16 @@ export default function SignUp() {
           >
             Sign Up
           </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="#" variant="body2">
-                Already have an account? Sign in
-              </Link>
+          <Grid container justify="center">
+            <Grid item className>
+              <RouterLink to="./login" variant="body2">
+                {"Already have an account? Sign in"}
+              </RouterLink>
             </Grid>
           </Grid>
+          <Button color="secondary" className={classes.submit} onClick={home}>
+            Cancel
+          </Button>
         </form>
       </div>
       <Box mt={5}>
