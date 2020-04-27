@@ -47,38 +47,54 @@ export default function ButtonAppBar(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
   const logout = async () => {
     if (token) {
-      props.setUser(null);
-      localStorage.removeItem("token");
-      history.push("/");
+      const url = `${process.env.REACT_APP_API_URL}/user/logout`;
+      const response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.code === 200) {
+          props.setUser(null);
+          localStorage.removeItem("token");
+        }
+      }
     }
   };
 
-  const shareMovie = () => {
-    let temp = [];
+  const shareMovie = async () => {
     if (isYoutubeURl(youtubeUrl)) {
-      let id = 1;
-      if (localStorage.getItem("movieUrls")) {
-        id = JSON.parse(localStorage.getItem("movieUrls")).length + 1;
-        temp = JSON.parse(localStorage.getItem("movieUrls")).concat([
-          {
-            id: id,
-            url: youtubeUrl,
-            sharedBy: user.email,
+      if (token) {
+        const url = `${process.env.REACT_APP_API_URL}/posts/`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
           },
-        ]);
-      } else {
-        temp = [{ id: 1, url: youtubeUrl, sharedBy: user.email }];
+          body: JSON.stringify({
+            body: youtubeUrl,
+            image_url: "",
+          }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.code === 200) {
+            props.getSharedMovies();
+            notify("Info", "Shared a movie successfully ", "success");
+          }
+        }
       }
-      localStorage.setItem("movieUrls", JSON.stringify(temp));
-      props.renderMovies([{ id: id, url: youtubeUrl, sharedBy: user.email }]);
-      notify("Info", "Shared a movie successfully ", "success");
     } else {
       notify("Error", "Invalid youtube URL!", "danger");
     }
-    setYoutubeUrl("");
 
+    setYoutubeUrl("");
     handleClose();
   };
 

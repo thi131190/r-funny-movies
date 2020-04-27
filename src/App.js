@@ -54,18 +54,25 @@ function App() {
     ]);
   };
 
-  const renderMovies = (urls) => {
-    urls.map((e) => {
-      getMoviesInfo(e.id, getIdFromUrl(e.url), e.sharedBy);
+  const getSharedMovies = async () => {
+    const url = `${process.env.REACT_APP_API_URL}/posts/`;
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+    if (response.ok) {
+      const data = await response.json();
+      setMovies([]);
+      data.map((movie) =>
+        getMoviesInfo(movie.id, getIdFromUrl(movie.body), movie.author.email)
+      );
+    }
   };
 
   useEffect(() => {
     getUser();
-    if (localStorage.getItem("movieUrls")) {
-      urls = JSON.parse(localStorage.getItem("movieUrls"));
-    }
-    renderMovies(urls);
+    getSharedMovies();
   }, []);
 
   return (
@@ -75,7 +82,7 @@ function App() {
         user={user}
         setUser={setUser}
         urls={urls}
-        renderMovies={renderMovies}
+        getSharedMovies={getSharedMovies}
       />
       {loading ? (
         <CircularProgress />
